@@ -3,8 +3,9 @@ name: ci
 # A push on the repo triggers the workflow
 on:
   push:
-    branches:
-      - "main"
+    tags: [ v* ]
+    # branches:
+    #   - "main"
 
 env:
   REGISTRY: mawinkler
