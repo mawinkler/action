@@ -101,8 +101,6 @@ jobs:
           if [ -f "malware" ]; then cat malware; fi
           if [ -f "vulnerabilities" ]; then cat vulnerabilities; fi
           # if [ -f "malware" ] || [ -f "vulnerabilities" ]; then exit 1; fi
-          echo Tags: ${{ steps.meta.outputs.tags }}
-          echo Labels: ${{ steps.meta.outputs.labels }}
 
       # Login to the registry. Here we just use Docker
       - name: Login to Docker Hub
@@ -120,7 +118,7 @@ jobs:
           push: true
           # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          # labels: ${{ steps.meta.outputs.labels }}
 
       # Rescan in the registry to support admission control
       - name: Registry Scan
