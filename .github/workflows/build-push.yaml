@@ -41,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          tags: ${{ secrets.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           outputs: type=docker,dest=/tmp/image.tar
 
       # Next step is to scan the build image for vulnerabilities and malware
