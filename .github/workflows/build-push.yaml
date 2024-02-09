@@ -7,6 +7,8 @@ on:
       - "main"
 
 env:
+  REGISTRY: mawinkler
+  IMAGE_NAME: ${{ github.repository }}
   TMAS_API_KEY: ${{ secrets.TMAS_API_KEY }}
   REGION: us-east-1
   THRESHOLD: "critical"
@@ -25,6 +27,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Extract metadata for the Docker image
+        id: meta
+        # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          
       # At first, we build the image and save it as a tar ball
       - name: Build and store
         uses: docker/build-push-action@v5
@@ -36,11 +45,7 @@ jobs:
       # Next step is to scan the build image for vulnerabilities and malware
       - name: Scan
         env:
-          # TMAS_API_KEY: ${{ secrets.TMAS_API_KEY }}
-          # REGION: us-east-1
           SBOM: true # Saves SBOM to SBOM.json so you can export it as an artifact later.
-          # MALWARE_SCAN: true # Enable malware scan.
-          # THRESHOLD: "critical"
         run: |
           # Install tmas latest version
           curl -s -L https://gist.github.com/raphabot/abae09b46c29afc7c3b918b7b8ec2a5c/raw/ | bash
@@ -109,13 +114,13 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+          # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+          tags:
+            ${{ steps.meta.outputs.tags }}
+            latest
+          labels: ${{ steps.meta.outputs.labels }}
 
       # Rescan in the registry to support admission control
       - name: Registry Scan
-        # env:
-        #   TMAS_API_KEY: ${{ secrets.TMAS_API_KEY }}
-        #   REGION: us-east-1
-        #   MALWARE_SCAN: true # Enable malware scan.
         run: |
           tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
