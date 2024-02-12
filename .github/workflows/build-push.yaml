@@ -129,4 +129,4 @@ jobs:
       # Rescan in the registry to support admission control
       - name: Registry Scan
         run: |
-          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ steps.meta.outputs.tags }}
+          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }}
