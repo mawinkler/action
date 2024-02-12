@@ -18,6 +18,9 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       # Prepare the Docker Buildx environment
