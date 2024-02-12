@@ -128,8 +128,8 @@ jobs:
       - name: Summarize the Docker digest
         run: |
           echo 'Digest: ${{ steps.build.outputs.digest }}'
-          echo 'Image: ${{ steps.meta.outputs.tags.0 }}'
-          echo 'Image: ${{ steps.meta.outputs.tags.1 }}'
+          echo 'Image: ${{ steps.meta.outputs.tags[0] }}'
+          echo 'Image: ${{ steps.meta.outputs.tags[1] }}'
 
       - name: Registry Scan
         run: |
