@@ -33,11 +33,9 @@ jobs:
 
       - name: Extract metadata for the Docker image
         id: meta
-        # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        uses: docker/metadata-action@v5 #9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # images: ${{ env.IMAGE_NAME }}
           
       # At first, we build the image and save it as a tar ball
       - name: Build and store
@@ -121,15 +119,15 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64 #,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
           # labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ steps.meta.outputs.tags }},push-by-digest=true,name-canonical=true,push=true
+          # outputs: type=image,name=${{ steps.meta.outputs.tags }},push-by-digest=true,name-canonical=true,push=true
 
       # Rescan in the registry to support admission control
       - name: Registry Scan
         run: |
-          echo ${{ steps.build.outputs.digest }}
+          # echo ${{ steps.build.outputs.digest }}
           tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ steps.meta.outputs.tags }}
