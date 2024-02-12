@@ -125,6 +125,7 @@ jobs:
           # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
           # labels: ${{ steps.meta.outputs.labels }}
+          outputs: digest
 
       # Rescan in the registry to support admission control
       - name: Registry Scan
