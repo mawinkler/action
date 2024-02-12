@@ -34,7 +34,7 @@ jobs:
       - name: Extract metadata for the Docker image
         id: meta
         # uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5 #9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           # images: ${{ env.IMAGE_NAME }}
@@ -120,7 +120,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64 #,linux/arm64
           push: true
           # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
