@@ -4,8 +4,6 @@ name: ci
 on:
   push:
     tags: [ v* ]
-    # branches:
-    #   - "main"
 
 env:
   REGISTRY: ghcr.io
@@ -48,7 +46,7 @@ jobs:
       # Next step is to scan the build image for vulnerabilities and malware
       - name: Scan
         env:
-          SBOM: true # Saves SBOM to SBOM.json so you can export it as an artifact later.
+          SBOM: true # Saves SBOM to sbom.json so you can export it as an artifact later.
         run: |
           # Install tmas latest version
           curl -s -L https://gist.github.com/raphabot/abae09b46c29afc7c3b918b7b8ec2a5c/raw/ | bash
@@ -110,8 +108,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          # username: ${{ secrets.DOCKERHUB_USERNAME }}
-          # password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Rebuild the image and push to registry. This is fast since everything is cached.
       - name: Build and push
@@ -119,21 +115,18 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           # labels: ${{ steps.meta.outputs.labels }}
 
-      # Rescan in the registry to support admission control
-      - name: Summarize the Docker digest
+      - name: Summarize the Docker digest and tags
         run: |
           echo 'Digest: ${{ steps.build.outputs.digest }}'
-          echo 'Image: ${{ steps.meta.outputs.tags }}'
           echo 'Scan: registry:${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}'
-          
+          echo 'Tags: ${{ steps.meta.outputs.tags }}'
+
+      # Rescan in the registry to support admission control
       - name: Registry Scan
         run: |
-          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }} || true
-
-
-        # tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }} || true
+          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }} || true
