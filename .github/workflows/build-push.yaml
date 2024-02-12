@@ -117,6 +117,7 @@ jobs:
 
       # Rebuild the image and push to registry. This is fast since everything is cached.
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -125,9 +126,10 @@ jobs:
           # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
           # labels: ${{ steps.meta.outputs.labels }}
-          outputs: digest
+          outputs: type=image,name=${{ steps.meta.outputs.tags }},push-by-digest=true,name-canonical=true,push=true
 
       # Rescan in the registry to support admission control
       - name: Registry Scan
         run: |
+          echo ${{ steps.build.outputs.digest }}
           tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ steps.meta.outputs.tags }}
