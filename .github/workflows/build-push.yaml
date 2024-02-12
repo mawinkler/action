@@ -128,7 +128,9 @@ jobs:
       - name: Summarize the Docker digest
         run: |
           echo 'Digest: ${{ steps.build.outputs.digest }}'
+          echo 'Image: ${{ steps.meta.outputs.tags }}'
 
       - name: Registry Scan
         run: |
+          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }} || true
           tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }} || true
