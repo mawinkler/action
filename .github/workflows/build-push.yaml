@@ -121,10 +121,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
           # labels: ${{ steps.meta.outputs.labels }}
-          # outputs: type=image,name=${{ steps.meta.outputs.tags }},push-by-digest=true,name-canonical=true,push=true
 
       # Rescan in the registry to support admission control
       - name: Summarize the Docker digest
@@ -133,5 +131,4 @@ jobs:
 
       - name: Registry Scan
         run: |
-          # echo ${{ steps.build.outputs.digest }}
-          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ steps.meta.outputs.tags }}
+          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }}
