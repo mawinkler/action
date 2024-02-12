@@ -124,9 +124,12 @@ jobs:
           push: true
           # tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
           tags: ${{ steps.meta.outputs.tags }}
-          # labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       # Rescan in the registry to support admission control
       - name: Registry Scan
         run: |
+          echo Tags ${{ steps.meta.outputs.tags }}
+          echo Labels ${{ steps.meta.outputs.labels }}
+          
           tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }}
