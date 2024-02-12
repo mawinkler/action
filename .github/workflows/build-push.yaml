@@ -130,6 +130,5 @@ jobs:
       - name: Registry Scan
         run: |
           echo Tags ${{ steps.meta.outputs.tags }}
-          # echo Labels ${{ steps.meta.outputs.labels }}
 
-          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" -p linux/amd64 registry:${{ steps.meta.outputs.tags }}
+          tmas scan "$(if [ "$MALWARE_SCAN" = true ]; then echo "--malwareScan"; fi)" -r "$REGION" registry:${{ steps.meta.outputs.tags }}
