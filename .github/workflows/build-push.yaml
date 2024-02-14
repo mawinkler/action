@@ -99,7 +99,7 @@ jobs:
           ls -l
           if [ -f "malware" ]; then cat malware; fi
           if [ -f "vulnerabilities" ]; then cat vulnerabilities; fi
-          # if [ -f "malware" ] || [ -f "vulnerabilities" ]; then exit 1; fi
+          if [ -f "malware" ] || [ -f "vulnerabilities" ]; then exit 1; fi
 
       # Login to the registry. Here we just use Docker
       - name: Login to the Container registry
