@@ -57,27 +57,27 @@ jobs:
           if [ "$SBOM" = true ]; then mv SBOM_* sbom.json; fi
 
           echo Analyze result
-          fail=0
+          fail_vul=0
+          fail_mal=0
           [ "${THRESHOLD}" = "any" ] && \
-            [ $(jq '.vulnerability.totalVulnCount' result.json) -ne 0 ] && fail=1
+            [ $(jq '.vulnerability.totalVulnCount' result.json) -ne 0 ] && fail_vul=1
 
           [ "${THRESHOLD}" = "critical" ] && \
-            [ $(jq '.vulnerability.criticalCount' result.json) -ne 0 ] && fail=2
+            [ $(jq '.vulnerability.criticalCount' result.json) -ne 0 ] && fail_vul=1
 
           [ "${THRESHOLD}" = "high" ] && \
-            [ $(jq '.vulnerability.highCount + .vulnerability.criticalCount' result.json) -ne 0 ] && fail=3
+            [ $(jq '.vulnerability.highCount + .vulnerability.criticalCount' result.json) -ne 0 ] && fail_vul=1
 
           [ "${THRESHOLD}" = "medium" ] && \
-            [ $(jq '.vulnerability.mediumCount + .vulnerability.highCount + .vulnerability.criticalCount' result.json) -ne 0 ] && fail=4
+            [ $(jq '.vulnerability.mediumCount + .vulnerability.highCount + .vulnerability.criticalCount' result.json) -ne 0 ] && fail_vul=1
 
           [ "${THRESHOLD}" = "low" ] &&
-            [ $(jq '.vulnerability.lowCount + .vulnerability.mediumCount + .vulnerability.highCount + .vulnerability.criticalCount' result.json) -ne 0 ] && fail=5
+            [ $(jq '.vulnerability.lowCount + .vulnerability.mediumCount + .vulnerability.highCount + .vulnerability.criticalCount' result.json) -ne 0 ] && fail_vul=1
 
-          [ $(jq '.malware.scanResult' result.json) -ne 0 ] && fail=6
+          [ $(jq '.malware.scanResult' result.json) -ne 0 ] && fail_mal=1
 
-          [ $fail -eq 6 ] && echo !!! Malware found !!! > malware || true
-
-          [ $fail -ne 0 ] && echo !!! Vulnerability threshold exceeded !!! > vulnerabilities || true
+          [ $fail_vul ] && echo !!! Vulnerability threshold exceeded !!! > vulnerabilities || true
+          [ $fail_mal ] && echo !!! Malware found !!! > malware || true
 
       # Upload Scan Result and SBOM Artifact if available
       - name: Upload Scan Result Artifact
@@ -97,6 +97,7 @@ jobs:
       # Fail the workflow if we found malware or reached the vulnerability threshold
       - name: Fail Action
         run: |
+          ls -l
           if [ "$FAIL_ACTION" = true ]; then
             if [ -f "malware" ]; then cat malware; fi
             if [ -f "vulnerabilities" ]; then cat vulnerabilities; fi
