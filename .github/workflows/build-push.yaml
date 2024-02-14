@@ -124,7 +124,6 @@ jobs:
       - name: Summarize the Docker digest and tags
         run: |
           echo 'Digest: ${{ steps.build.outputs.digest }}'
-          echo 'Scan: registry:${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}'
           echo 'Tags: ${{ steps.meta.outputs.tags }}'
 
       # Rescan in the registry to support admission control
