@@ -12,6 +12,7 @@ env:
   REGION: us-east-1
   THRESHOLD: "critical"
   MALWARE_SCAN: true
+  FAIL_ACTION: false
 
 jobs:
   docker:
@@ -93,13 +94,14 @@ jobs:
           path: sbom.json
           retention-days: 30
 
-      # Fail the workflow if we found malware or reach the vulnerability threshold
-      - name: Fail Scan
+      # Fail the workflow if we found malware or reached the vulnerability threshold
+      - name: Fail Action
         run: |
-          ls -l
-          if [ -f "malware" ]; then cat malware; fi
-          if [ -f "vulnerabilities" ]; then cat vulnerabilities; fi
-          # if [ -f "malware" ] || [ -f "vulnerabilities" ]; then exit 1; fi
+          if [ "$FAIL_ACTION" = true ]; then
+            if [ -f "malware" ]; then cat malware; fi
+            if [ -f "vulnerabilities" ]; then cat vulnerabilities; fi
+            if [ -f "malware" ] || [ -f "vulnerabilities" ]; then exit 1; fi
+          fi
 
       # Login to the registry. Here we just use Docker
       - name: Login to the Container registry
