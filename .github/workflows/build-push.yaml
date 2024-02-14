@@ -12,7 +12,7 @@ env:
   REGION: us-east-1
   THRESHOLD: "critical"
   MALWARE_SCAN: true
-  FAIL_ACTION: false
+  FAIL_ACTION: true
 
 jobs:
   docker:
